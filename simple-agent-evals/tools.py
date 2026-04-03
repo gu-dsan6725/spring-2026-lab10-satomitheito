@@ -14,6 +14,8 @@ All tool log messages are prefixed with [Tool] for easy filtering in debug.log:
 import json
 import logging
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import requests
 from ddgs import DDGS
@@ -34,6 +36,54 @@ OSRM_BASE_URL = "https://router.project-osrm.org/route/v1/driving"
 OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1/forecast"
 NOMINATIM_USER_AGENT = "simple-agent-evals/1.0"
 HTTP_TIMEOUT_SECONDS = 10
+FRANKFURTER_BASE_URL = "https://api.frankfurter.app/latest"
+
+CITY_TIMEZONES = {
+    "new york": "America/New_York",
+    "los angeles": "America/Los_Angeles",
+    "chicago": "America/Chicago",
+    "denver": "America/Denver",
+    "san francisco": "America/Los_Angeles",
+    "seattle": "America/Los_Angeles",
+    "boston": "America/New_York",
+    "miami": "America/New_York",
+    "houston": "America/Chicago",
+    "phoenix": "America/Phoenix",
+    "washington dc": "America/New_York",
+    "washington": "America/New_York",
+    "austin": "America/Chicago",
+    "nashville": "America/Chicago",
+    "atlanta": "America/New_York",
+    "london": "Europe/London",
+    "paris": "Europe/Paris",
+    "berlin": "Europe/Berlin",
+    "madrid": "Europe/Madrid",
+    "rome": "Europe/Rome",
+    "amsterdam": "Europe/Amsterdam",
+    "tokyo": "Asia/Tokyo",
+    "beijing": "Asia/Shanghai",
+    "shanghai": "Asia/Shanghai",
+    "seoul": "Asia/Seoul",
+    "mumbai": "Asia/Kolkata",
+    "delhi": "Asia/Kolkata",
+    "dubai": "Asia/Dubai",
+    "singapore": "Asia/Singapore",
+    "hong kong": "Asia/Hong_Kong",
+    "bangkok": "Asia/Bangkok",
+    "sydney": "Australia/Sydney",
+    "melbourne": "Australia/Melbourne",
+    "auckland": "Pacific/Auckland",
+    "toronto": "America/Toronto",
+    "vancouver": "America/Vancouver",
+    "mexico city": "America/Mexico_City",
+    "sao paulo": "America/Sao_Paulo",
+    "cairo": "Africa/Cairo",
+    "johannesburg": "Africa/Johannesburg",
+    "moscow": "Europe/Moscow",
+    "istanbul": "Europe/Istanbul",
+    "anchorage": "America/Anchorage",
+    "honolulu": "Pacific/Honolulu",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -281,4 +331,105 @@ def get_directions(
 
     except Exception as e:
         logger.error(f"[Tool] get_directions failed: {e}")
+        return json.dumps({"error": str(e)})
+
+
+@tool
+def get_current_time(
+    city: str
+) -> str:
+    """
+    Get the current local time in a city. Use this when users ask about
+    the current time, time zones, or what time it is in a specific location.
+
+    Args:
+        city: Name of the city (e.g. 'Tokyo', 'New York', 'London')
+
+    Returns:
+        JSON string with current local time, timezone name, and UTC offset
+    """
+    try:
+        logger.info(f"[Tool] get_current_time: city='{city}'")
+
+        city_lower = city.lower().strip()
+        tz_id = CITY_TIMEZONES.get(city_lower)
+
+        if not tz_id:
+            logger.warning(f"[Tool] get_current_time: city '{city}' not found in timezone map")
+            return json.dumps({"error": f"City '{city}' not found. Try a major city name like 'Tokyo', 'London', or 'New York'."})
+
+        tz = ZoneInfo(tz_id)
+        now = datetime.now(tz)
+
+        utc_offset_raw = now.strftime("%z")
+        utc_offset = f"{utc_offset_raw[:3]}:{utc_offset_raw[3:]}"
+
+        time_info = {
+            "city": city,
+            "timezone": tz_id,
+            "timezone_abbreviation": now.strftime("%Z"),
+            "local_time": now.strftime("%Y-%m-%d %H:%M:%S"),
+            "utc_offset": utc_offset,
+        }
+
+        logger.info(f"[Tool] get_current_time: {city} -> {time_info['local_time']} {time_info['timezone_abbreviation']}")
+        return json.dumps(time_info, indent=2)
+
+    except Exception as e:
+        logger.error(f"[Tool] get_current_time failed: {e}")
+        return json.dumps({"error": str(e)})
+
+
+@tool
+def get_exchange_rate(
+    base_currency: str,
+    target_currency: str,
+    amount: float = 1.0
+) -> str:
+    """
+    Get the current exchange rate between two currencies using the Frankfurter API.
+    Use this when users ask about currency conversion, exchange rates, or how much
+    money is worth in another currency.
+
+    Args:
+        base_currency: The source currency code (e.g. 'USD', 'EUR', 'GBP')
+        target_currency: The target currency code (e.g. 'JPY', 'EUR', 'GBP')
+        amount: The amount to convert (default 1.0)
+
+    Returns:
+        JSON string with exchange rate and converted amount
+    """
+    try:
+        logger.info(f"[Tool] get_exchange_rate: {amount} {base_currency} -> {target_currency}")
+
+        response = requests.get(
+            FRANKFURTER_BASE_URL,
+            params={
+                "from": base_currency.upper(),
+                "to": target_currency.upper(),
+                "amount": amount,
+            },
+            timeout=HTTP_TIMEOUT_SECONDS,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        target_upper = target_currency.upper()
+        converted_amount = data["rates"][target_upper]
+        rate = data["rates"][target_upper] / amount if amount != 0 else 0
+
+        exchange_info = {
+            "base_currency": base_currency.upper(),
+            "target_currency": target_upper,
+            "amount": amount,
+            "rate": round(rate, 4),
+            "converted_amount": round(converted_amount, 2),
+            "date": data.get("date", "unknown"),
+        }
+
+        logger.info(f"[Tool] get_exchange_rate: {amount} {base_currency.upper()} = {converted_amount} {target_upper}")
+        return json.dumps(exchange_info, indent=2)
+
+    except Exception as e:
+        logger.error(f"[Tool] get_exchange_rate failed: {e}")
         return json.dumps({"error": str(e)})

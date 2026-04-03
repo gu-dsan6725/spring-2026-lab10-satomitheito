@@ -1,0 +1,122 @@
+{
+  "total_cases": 5,
+  "errors": 0,
+  "overall_scores": {
+    "Latency": {
+      "average": 0.95,
+      "min": 0.75,
+      "max": 1.0,
+      "count": 5
+    },
+    "NoError": {
+      "average": 1.0,
+      "min": 1,
+      "max": 1,
+      "count": 5
+    },
+    "ResponseCompleteness": {
+      "average": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "count": 5
+    },
+    "ScopeAwareness": {
+      "average": 1.0,
+      "min": 1,
+      "max": 1,
+      "count": 5
+    },
+    "ToolSelection": {
+      "average": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "count": 5
+    }
+  },
+  "per_category": {
+    "multi_tool": {
+      "Latency": {
+        "average": 0.95,
+        "count": 5
+      },
+      "NoError": {
+        "average": 1.0,
+        "count": 5
+      },
+      "ResponseCompleteness": {
+        "average": 0.5,
+        "count": 5
+      },
+      "ScopeAwareness": {
+        "average": 1.0,
+        "count": 5
+      },
+      "ToolSelection": {
+        "average": 1.0,
+        "count": 5
+      }
+    }
+  },
+  "per_case": [
+    {
+      "input": "What time is it right now in Tokyo?",
+      "category": "multi_tool",
+      "scores": {
+        "ToolSelection": 1.0,
+        "ResponseCompleteness": 0.5,
+        "Latency": 1.0,
+        "NoError": 1,
+        "ScopeAwareness": 1
+      },
+      "error": null
+    },
+    {
+      "input": "What time is it in London and what is the weather like there?",
+      "category": "multi_tool",
+      "scores": {
+        "ToolSelection": 1.0,
+        "ResponseCompleteness": 0.5,
+        "Latency": 1.0,
+        "NoError": 1,
+        "ScopeAwareness": 1
+      },
+      "error": null
+    },
+    {
+      "input": "How much is 100 USD worth in Euros?",
+      "category": "multi_tool",
+      "scores": {
+        "ToolSelection": 1.0,
+        "ResponseCompleteness": 0.0,
+        "Latency": 1.0,
+        "NoError": 1,
+        "ScopeAwareness": 1
+      },
+      "error": null
+    },
+    {
+      "input": "I am traveling to Japan next week. What is the exchange rate from USD to JPY, and what is the current weather in Tokyo?",
+      "category": "multi_tool",
+      "scores": {
+        "ToolSelection": 1.0,
+        "ResponseCompleteness": 0.5,
+        "Latency": 1.0,
+        "NoError": 1,
+        "ScopeAwareness": 1
+      },
+      "error": null
+    },
+    {
+      "input": "I am planning a business trip from New York to Tokyo. How long is the flight route by driving to JFK first, what is the ",
+      "category": "multi_tool",
+      "scores": {
+        "ToolSelection": 1.0,
+        "ResponseCompleteness": 1.0,
+        "Latency": 0.75,
+        "NoError": 1,
+        "ScopeAwareness": 1
+      },
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+[
+    {
+        "input": "What time is it right now in Tokyo?",
+        "expected_output": "The current local time in Tokyo with the timezone (JST) and UTC offset (+09:00).",
+        "expected_tools": ["get_current_time"],
+        "category": "multi_tool",
+        "difficulty": "easy"
+    },
+    {
+        "input": "What time is it in London and what is the weather like there?",
+        "expected_output": "The current local time in London with timezone info, and the current weather in London including temperature and conditions.",
+        "expected_tools": ["get_current_time", "get_weather"],
+        "category": "multi_tool",
+        "difficulty": "medium"
+    },
+    {
+        "input": "How much is 100 USD worth in Euros?",
+        "expected_output": "The current USD to EUR exchange rate and the converted amount for 100 USD.",
+        "expected_tools": ["get_exchange_rate"],
+        "category": "multi_tool",
+        "difficulty": "easy"
+    },
+    {
+        "input": "I am traveling to Japan next week. What is the exchange rate from USD to JPY, and what is the current weather in Tokyo?",
+        "expected_output": "The current USD to JPY exchange rate, and the current weather in Tokyo including temperature and conditions.",
+        "expected_tools": ["get_exchange_rate", "get_weather"],
+        "category": "multi_tool",
+        "difficulty": "medium"
+    },
+    {
+        "input": "I am planning a business trip from New York to Tokyo. How long is the flight route by driving to JFK first, what is the current time in Tokyo, what is the weather there, what is the USD to JPY exchange rate, and what are the top business hotels in Shinjuku?",
+        "expected_output": "Driving directions from Manhattan to JFK Airport with distance and time, the current local time in Tokyo with timezone info, current Tokyo weather with temperature, the USD to JPY exchange rate, and a list of recommended business hotels in the Shinjuku area of Tokyo.",
+        "expected_tools": ["get_directions", "get_current_time", "get_weather", "get_exchange_rate", "duckduckgo_search"],
+        "category": "multi_tool",
+        "difficulty": "hard"
+    }
+]
